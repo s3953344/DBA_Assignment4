@@ -44,17 +44,29 @@ app.get("/add", (req, res) => {
 
 // API endpoint
 app.get("/api/data", async (req, res, next) => {
-  console.log(req.query);
   try {
+    // Do not include any blank fields in the given query param
     const findQuery = {};
     for (const property in req.query) {
       if (req.query[property] != "") { findQuery[property] = req.query[property] }
     }
-    console.log("findQuery");
-    console.log(findQuery);
-
     const data = await db.collection("listingsAndReviews").find(findQuery).toArray();
+    console.log(data.length)
     res.json(data);
+
+    // // If no params given
+    // if (Object.keys(req.query).length === 0) {
+    //   const data = await db.collection("listingsAndReviews").find().toArray();
+    //   res.json(data);
+    // } else {
+    //   // Do not include any blank fields in the given query param
+    //   const findQuery = {};
+    //   for (const property in req.query) {
+    //     if (req.query[property] != "") { findQuery[property] = req.query[property] }
+    //   }
+    //   const data = await db.collection("listingsAndReviews").find(findQuery).toArray();
+    //   res.json(data);
+    // }
   } catch (error) {
     console.error("Failed to fetch data from MongoDB", error);
     next(error);

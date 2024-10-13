@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import "./HomePage.css";
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const API_HOST = "http://localhost:3000";
 
-interface ListingsSearchOptions {
-  location: string;
-  bedrooms: string | number;
-  propertyType: string;
+interface Listing {
+  name: string
 }
 
 const propertiesList = [
@@ -30,21 +28,20 @@ const propertiesList = [
 const bedroomsList = ["", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20];
 
 export default function HomePage() {
-  const [location, setLocation] = useState("");
-  const [bedrooms, setBedrooms] = useState("");
-  const [propertyType, setPropertyType] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   // todo: change to match with actual field names
-  const searchParams = { location: "", bedrooms: "", propertyType: "" };
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<Listing[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // TODO: add query params according to search params
-        const results: any = await axios.get(API_HOST + "/api/data");
-        setSearchResults(results);
+        setIsLoading(true);
+        const data: any = await axios.get(API_HOST + "/api/data");
+        setSearchResults(data.data);
       } catch (err) {
         console.log(err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -53,11 +50,17 @@ export default function HomePage() {
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const searchParamsString = new URLSearchParams(formData as any).toString();
-    console.log(API_HOST + '/api/data?' + searchParamsString);
-    const data = await axios.get(API_HOST + '/api/data?' + searchParamsString);
-    console.log(data);
+    try {
+      setIsLoading(true);
+      const formData = new FormData(e.target as HTMLFormElement);
+      const searchParamsString = new URLSearchParams(formData as any).toString();
+      const data = await axios.get(API_HOST + "/api/data?" + searchParamsString);
+      setSearchResults(data.data);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -84,7 +87,7 @@ export default function HomePage() {
             </label>
             <label className="column">
               Property type
-              <select id="propertyType" name='propertyType'>
+              <select id="propertyType" name="propertyType">
                 {propertiesList.map((value) => {
                   return <option value={value}>{value}</option>;
                 })}
@@ -97,7 +100,22 @@ export default function HomePage() {
         </form>
       </div>
 
-      <div className="bottom-section row">{}</div>
+      <div className="bottom-section row">
+        {
+          isLoading ?
+          <p>loading...</p>
+
+          :
+
+          searchResults.map((listing) => {
+            return <h2>{listing.name}</h2>
+          })
+        }
+
+        {
+          
+        }
+      </div>
     </div>
   );
 }
