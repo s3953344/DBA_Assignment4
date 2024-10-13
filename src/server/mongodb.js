@@ -1,3 +1,5 @@
+// TODO: DELETE THIS FILE! THIS WAS ONLY FOR TESTING
+
 // const { MongoClient, ServerApiVersion } = require('mongodb');
 import { MongoClient, ServerApiVersion } from "mongodb";
 const uri =

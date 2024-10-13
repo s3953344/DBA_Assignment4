@@ -1,0 +1,21 @@
+.home-page {
+  width: 80vw;
+}
+
+.top-section {
+  padding-inline: 8rem;
+  padding-block: 1rem;
+  background-color: rgb(255, 248, 237);
+}
+
+.listing-search-form label {
+  padding: 0.5em;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.listing-search-form input, select, button {
+  margin-top: 0.2em;
+  flex: 1;
+}

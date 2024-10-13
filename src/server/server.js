@@ -1,5 +1,5 @@
 // AVAILABLE ON PORT 3000
-
+import cors from 'cors'
 import express from "express";
 import { MongoClient } from "mongodb";
 
@@ -15,6 +15,7 @@ const client = new MongoClient(uri);
 // Parse JSON bodies (as sent by API clients)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cors());
 
 async function connectToDatabase() {
   try {
@@ -43,8 +44,16 @@ app.get("/add", (req, res) => {
 
 // API endpoint
 app.get("/api/data", async (req, res, next) => {
+  console.log(req.query);
   try {
-    const data = await db.collection("listingsAndReviews").find().toArray();
+    const findQuery = {};
+    for (const property in req.query) {
+      if (req.query[property] != "") { findQuery[property] = req.query[property] }
+    }
+    console.log("findQuery");
+    console.log(findQuery);
+
+    const data = await db.collection("listingsAndReviews").find(findQuery).toArray();
     res.json(data);
   } catch (error) {
     console.error("Failed to fetch data from MongoDB", error);
@@ -54,11 +63,14 @@ app.get("/api/data", async (req, res, next) => {
 
 // MY DATA #################################
 app.get("/api/test", async (req, res, next) => {
-  // const data = db
+  // const data = await db
   //   .collection("listingsAndReviews")
   //   .findOne({ name: "Be Happy in Porto" });
-  const listings = db.collection("listingsAndReviews");
-  const data = await listings.findOne({ name: "Be Happy in Porto" });
+  const data = await db
+    .collection("listingsAndReviews")
+    .distinct("bedrooms");
+  // const listings = db.collection("listingsAndReviews");
+  // const data = await listings.findOne({ name: "Be Happy in Porto" });
   console.log(data);
   res.send(data);
 });
