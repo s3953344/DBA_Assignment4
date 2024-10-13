@@ -50,23 +50,11 @@ app.get("/api/data", async (req, res, next) => {
     for (const property in req.query) {
       if (req.query[property] != "") { findQuery[property] = req.query[property] }
     }
-    const data = await db.collection("listingsAndReviews").find(findQuery).toArray();
-    console.log(data.length)
+    if (findQuery.bedrooms) {
+      findQuery.bedrooms = parseInt(findQuery.bedrooms);
+    }
+    const data = await db.collection("listingsAndReviews").find(findQuery).limit(1).toArray();
     res.json(data);
-
-    // // If no params given
-    // if (Object.keys(req.query).length === 0) {
-    //   const data = await db.collection("listingsAndReviews").find().toArray();
-    //   res.json(data);
-    // } else {
-    //   // Do not include any blank fields in the given query param
-    //   const findQuery = {};
-    //   for (const property in req.query) {
-    //     if (req.query[property] != "") { findQuery[property] = req.query[property] }
-    //   }
-    //   const data = await db.collection("listingsAndReviews").find(findQuery).toArray();
-    //   res.json(data);
-    // }
   } catch (error) {
     console.error("Failed to fetch data from MongoDB", error);
     next(error);
@@ -80,7 +68,7 @@ app.get("/api/test", async (req, res, next) => {
   //   .findOne({ name: "Be Happy in Porto" });
   const data = await db
     .collection("listingsAndReviews")
-    .distinct("bedrooms");
+    .distinct("property_type");
   // const listings = db.collection("listingsAndReviews");
   // const data = await listings.findOne({ name: "Be Happy in Porto" });
   console.log(data);

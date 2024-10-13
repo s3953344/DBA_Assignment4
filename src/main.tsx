@@ -13,7 +13,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
-    path: "bookings",
+    path: "listing/:id",
     element: <p>TODO</p>,
   },
 ]);

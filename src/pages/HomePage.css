@@ -19,3 +19,17 @@
   margin-top: 0.2em;
   flex: 1;
 }
+
+.listing-card {
+  border: gray 1px solid;
+  border-radius: 1rem;
+  box-shadow: gray 5px 5px 5px;
+  margin: 1rem;
+  padding: 1rem;
+  padding-inline: 3rem;
+  max-width: 30rem;
+}
+
+.listing-card h3 {
+  text-decoration: underline;
+}

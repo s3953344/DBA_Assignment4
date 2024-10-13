@@ -1,34 +1,65 @@
 import { useEffect, useState } from "react";
 import "./HomePage.css";
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import { ThreeDots } from "react-loader-spinner";
+import { Link } from "react-router-dom";
 
 const API_HOST = "http://localhost:3000";
 
 interface Listing {
-  name: string
+  _id: number;
+  name: string;
+  summary: string;
+  price: number;
+  "review_scores.review_scores_rating": number;
+  bedrooms: number;
+  propertyType: string;
 }
 
 const propertiesList = [
   "",
-  "Barcelona",
-  "Hong Kong",
-  "Istanbul",
-  "Kauai",
-  "Maui",
-  "Montreal",
-  "New York",
-  "Oahu",
-  "Other (Domestic)",
-  "Other (International)",
-  "Porto",
-  "Rio De Janeiro",
-  "Sydney",
-  "The Big Island",
+  "Aparthotel",
+  "Apartment",
+  "Barn",
+  "Bed and breakfast",
+  "Boat",
+  "Boutique hotel",
+  "Bungalow",
+  "Cabin",
+  "Camper/RV",
+  "Campsite",
+  "Casa particular (Cuba)",
+  "Castle",
+  "Chalet",
+  "Condominium",
+  "Cottage",
+  "Earth house",
+  "Farm stay",
+  "Guest suite",
+  "Guesthouse",
+  "Heritage hotel (India)",
+  "Hostel",
+  "Hotel",
+  "House",
+  "Houseboat",
+  "Hut",
+  "Loft",
+  "Nature lodge",
+  "Other",
+  "Pension (South Korea)",
+  "Resort",
+  "Serviced apartment",
+  "Tiny house",
+  "Townhouse",
+  "Train",
+  "Treehouse",
+  "Villa",
 ];
 const bedroomsList = ["", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20];
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<any>("");
   // todo: change to match with actual field names
   const [searchResults, setSearchResults] = useState<Listing[]>([]);
 
@@ -38,8 +69,9 @@ export default function HomePage() {
         setIsLoading(true);
         const data: any = await axios.get(API_HOST + "/api/data");
         setSearchResults(data.data);
-      } catch (err) {
+      } catch (err: any) {
         console.log(err);
+        setError(err);
       } finally {
         setIsLoading(false);
       }
@@ -53,11 +85,16 @@ export default function HomePage() {
     try {
       setIsLoading(true);
       const formData = new FormData(e.target as HTMLFormElement);
-      const searchParamsString = new URLSearchParams(formData as any).toString();
-      const data = await axios.get(API_HOST + "/api/data?" + searchParamsString);
+      const searchParamsString = new URLSearchParams(
+        formData as any
+      ).toString();
+      const data = await axios.get(
+        API_HOST + "/api/data?" + searchParamsString
+      );
       setSearchResults(data.data);
-    } catch (err) {
+    } catch (err: any) {
       console.log(err);
+      setError(err);
     } finally {
       setIsLoading(false);
     }
@@ -87,7 +124,7 @@ export default function HomePage() {
             </label>
             <label className="column">
               Property type
-              <select id="propertyType" name="propertyType">
+              <select id="propertyType" name="property_type">
                 {propertiesList.map((value) => {
                   return <option value={value}>{value}</option>;
                 })}
@@ -101,21 +138,56 @@ export default function HomePage() {
       </div>
 
       <div className="bottom-section row">
-        {
-          isLoading ?
-          <p>loading...</p>
-
-          :
-
-          searchResults.map((listing) => {
-            return <h2>{listing.name}</h2>
-          })
-        }
-
-        {
-          
-        }
+        {isLoading ? (
+          <div className="loading">
+            <i>Loading listings. This may take a few seconds.</i>
+            <ThreeDots
+              visible={true}
+              height="80"
+              width="80"
+              color="#4fa94d"
+              radius="9"
+              ariaLabel="three-dots-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          </div>
+        ) : error ? (
+          // Render error message if error occurred
+          <div>
+            {error.code === "ERR_NETWORK" && (
+              <p>
+                Could not connect to server. Are you sure you ran it? Use the
+                command "node ./src/server/server.js" from the root folder to
+                connect to MongoDB.
+              </p>
+            )}
+            <i>{error.toString()}</i>
+          </div>
+        ) : searchResults.length === 0 ? (
+          <p>No results... Try changing your search!</p>
+        ) : (
+          // if all is well...
+          <div className="results-list">
+            <p>Found {searchResults.length} results</p>
+            {searchResults.map((listing) => {
+              return <ListingCard listing={listing} />;
+            })}
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+
+function ListingCard({ listing }: {listing: Listing}) {
+  return (
+    <div className="listing-card">
+      <Link to={"listing/" + listing._id}>
+        <h3>{listing.name}</h3>
+      </Link>
+      <p>{listing.summary}</p>
     </div>
   );
 }
