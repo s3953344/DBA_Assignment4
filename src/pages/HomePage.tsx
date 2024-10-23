@@ -4,14 +4,16 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { ThreeDots } from "react-loader-spinner";
 import { Link } from "react-router-dom";
 
-const API_HOST = "http://localhost:3000";
-
 interface Listing {
   _id: number;
   name: string;
   summary: string;
-  price: number;
-  "review_scores.review_scores_rating": number;
+  price: {
+    "$numberDecimal": number
+  };
+  review_scores: {
+    review_scores_rating: number
+  };
   bedrooms: number;
   propertyType: string;
 }
@@ -57,6 +59,8 @@ const propertiesList = [
 ];
 const bedroomsList = ["", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20];
 
+const API_HOST = "http://localhost:3000";
+
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<any>("");
@@ -69,6 +73,7 @@ export default function HomePage() {
         setIsLoading(true);
         const data: any = await axios.get(API_HOST + "/api/data");
         setSearchResults(data.data);
+        console.log(data.data[0]);
       } catch (err: any) {
         console.log(err);
         setError(err);
@@ -137,7 +142,7 @@ export default function HomePage() {
         </form>
       </div>
 
-      <div className="bottom-section row">
+      <div className="container bottom-section row">
         {isLoading ? (
           <div className="loading">
             <i>Loading listings. This may take a few seconds.</i>
@@ -165,7 +170,7 @@ export default function HomePage() {
             <i>{error.toString()}</i>
           </div>
         ) : searchResults.length === 0 ? (
-          <p>No results... Try changing your search!</p>
+          <p>No results... Try changing your search options!</p>
         ) : (
           // if all is well...
           <div className="results-list">
@@ -182,12 +187,17 @@ export default function HomePage() {
 
 
 function ListingCard({ listing }: {listing: Listing}) {
+  const price = listing.price.$numberDecimal;
+  const rating = listing.review_scores.review_scores_rating;
+
   return (
     <div className="listing-card">
       <Link to={"listing/" + listing._id}>
         <h3>{listing.name}</h3>
       </Link>
       <p>{listing.summary}</p>
+      <p><b>Daily price:</b> ${price ? price : "N/A"}</p>
+      <p><b>Customer rating:</b> {rating ? rating : "N/A"}</p>
     </div>
   );
 }

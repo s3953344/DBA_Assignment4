@@ -1,4 +1,6 @@
 // AVAILABLE ON PORT 3000
+const API_HOST = "http://localhost:3000";
+
 import cors from 'cors'
 import express from "express";
 import { MongoClient } from "mongodb";
@@ -53,7 +55,19 @@ app.get("/api/data", async (req, res, next) => {
     if (findQuery.bedrooms) {
       findQuery.bedrooms = parseInt(findQuery.bedrooms);
     }
-    const data = await db.collection("listingsAndReviews").find(findQuery).limit(1).toArray();
+    // TODO: REMOVE THIS LIMIT!!!!
+    const data = await db.collection("listingsAndReviews").find(findQuery).limit(5).toArray();
+    res.json(data);
+  } catch (error) {
+    console.error("Failed to fetch data from MongoDB", error);
+    next(error);
+  }
+});
+
+app.get("/api/data/:id", async (req, res, next) => {
+  try {
+    const data = await db.collection("listingsAndReviews").findOne({_id: req.params.id});
+    console.log(data);
     res.json(data);
   } catch (error) {
     console.error("Failed to fetch data from MongoDB", error);

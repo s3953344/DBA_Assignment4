@@ -3,9 +3,8 @@
 }
 
 .top-section {
-  padding-inline: 8rem;
+  /* padding-inline: 8rem; */
   padding-block: 1rem;
-  background-color: rgb(255, 248, 237);
 }
 
 .listing-search-form label {
@@ -23,7 +22,7 @@
 .listing-card {
   border: gray 1px solid;
   border-radius: 1rem;
-  box-shadow: gray 5px 5px 5px;
+  box-shadow: rgba(162, 162, 162, 0.361) 0px 0px 5px;
   margin: 1rem;
   padding: 1rem;
   padding-inline: 3rem;
