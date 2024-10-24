@@ -75,7 +75,7 @@ app.get("/api/data/:id", async (req, res, next) => {
   }
 });
 
-// MY DATA #################################
+// MY DATA ################################# DELETE LATER
 app.get("/api/test", async (req, res, next) => {
   // const data = await db
   //   .collection("listingsAndReviews")
