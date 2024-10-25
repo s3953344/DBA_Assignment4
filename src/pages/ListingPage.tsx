@@ -7,7 +7,7 @@ import { Listing } from "./HomePage";
 
 const API_HOST = "http://localhost:3000";
 
-type Inputs = {
+export type Booking = {
   checkIn: Date;
   checkOut: Date;
   name: string;
@@ -28,13 +28,31 @@ export default function ListingPage() {
     handleSubmit,
     formState: { errors },
     getValues,
-  } = useForm<Inputs>({ mode: "onChange" });
+    reset,
+  } = useForm<Booking>({ mode: "onChange" , defaultValues: {
+    name: "DEFAULT",
+    email: "DEFAULT@gmail.com",
+    phone: "0000000000",
+    postalAddress: "DEFAULT",
+    residentialAddress: "DEFAULT"
+  }, resetOptions: {keepIsValid: true}});
+  const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
+  const [formSubmitErr, setFormSubmitErr] = useState<string>("");
+
   const currentDate = new Date();
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    
-    // Send the data and the listing id
-    axios.post(API_HOST + "/api/data", { data: data, listingId: listing?._id });
+  const onSubmit: SubmitHandler<Booking> = (data) => {
+    // setDisableSubmit(true);
+    setFormSubmitErr("");
+    // reset();
+    try {
+      // Send the data and the listing id
+      axios.post(API_HOST + "/api/data", { data: data, listingId: listing?._id });
+      navigate("/bookingsuccess", {state: {booking: data, listing}});
+    } catch (err) {
+      console.log("error!!")
+      setFormSubmitErr("Form submission failed. Are you sure the server is running? Make sure to run 'npm run mongo' in the root directory.\n" + err);
+    }
   };
 
   // initial loading in data
@@ -42,12 +60,10 @@ export default function ListingPage() {
     const fetchData = async () => {
       try {
         const data = await axios.get(API_HOST + "/api/data/" + id!.toString());
-        if (data.data === null) {
-          navigate("/error");
-        }
         setListing(data.data);
       } catch (err) {
         console.log(err);
+        // navigate("/error");
       }
     };
 
@@ -75,8 +91,10 @@ export default function ListingPage() {
                 return (
                   <div className="booking">
                     <h5>Booking {index + 1}</h5>
-                    <p>Start: {new Date(booking.checkIn).toDateString()}</p>
-                    <p>End: {new Date(booking.checkOut).toDateString()}</p>
+                    <div className="d-flex gap-5">
+                      <p>Start: {new Date(booking.checkIn).toDateString()}</p>
+                      <p>End: {new Date(booking.checkOut).toDateString()}</p>
+                    </div>
                   </div>
                 );
               } else {
@@ -118,7 +136,7 @@ export default function ListingPage() {
                     inBeforeOut: (date: Date) =>
                       date >= getValues().checkIn
                         ? true
-                        : "Check in date must set be before the check out date",
+                        : "Check out must be after check in day",
                   },
                 })}
               />
@@ -181,7 +199,8 @@ export default function ListingPage() {
               />
               <span>{errors.residentialAddress?.message?.toString()}</span>
             </label>
-            <button type="submit">Submit</button>
+            <button type="submit" disabled={disableSubmit}>Submit</button>
+            <span>{formSubmitErr}</span>
           </form>
         </div>
       </div>

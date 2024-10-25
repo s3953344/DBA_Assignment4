@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import ListingPage from "./pages/ListingPage.tsx";
+import BookingSuccess from "./pages/BookingSuccess.tsx";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
   {
     path: "listing/:id",
     element: <ListingPage />,
+  },
+  {
+    path: "bookingsuccess",
+    element: <BookingSuccess />,
   },
 ]);
 

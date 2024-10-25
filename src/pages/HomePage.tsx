@@ -86,9 +86,8 @@ export default function HomePage() {
         setIsLoading(true);
         const data: any = await axios.get(API_HOST + "/api/data");
         setSearchResults(data.data);
-        console.log(data.data[0]);
+        // console.log(data.data[0]);
       } catch (err: any) {
-        console.log(err);
         setError(err);
       } finally {
         setIsLoading(false);
