@@ -3,7 +3,7 @@ const API_HOST = "http://localhost:3000";
 
 import cors from 'cors'
 import express from "express";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 import path from "path";
 import bodyParser from "body-parser";
@@ -67,7 +67,6 @@ app.get("/api/data", async (req, res, next) => {
 app.get("/api/data/:id", async (req, res, next) => {
   try {
     const data = await db.collection("listingsAndReviews").findOne({_id: req.params.id});
-    console.log(data);
     res.json(data);
   } catch (error) {
     console.error("Failed to fetch data from MongoDB", error);
@@ -75,98 +74,20 @@ app.get("/api/data/:id", async (req, res, next) => {
   }
 });
 
-// MY DATA ################################# DELETE LATER
-app.get("/api/test", async (req, res, next) => {
-  // const data = await db
-  //   .collection("listingsAndReviews")
-  //   .findOne({ name: "Be Happy in Porto" });
-  const data = await db
-    .collection("listingsAndReviews")
-    .distinct("property_type");
-  // const listings = db.collection("listingsAndReviews");
-  // const data = await listings.findOne({ name: "Be Happy in Porto" });
-  console.log(data);
-  res.send(data);
-});
-
 // API endpoint for adding data
 app.post("/api/data", async (req, res, next) => {
   try {
-    // const { mvNumb, age } = req.body;
-    const { mvNumb, mvTitle, yrMade, mvType, Crit, MPAA, Noms, Awrd, dirNumb } =
-      req.body;
-
-    // Validate that all data are present
-    /*
-    if (!mvNumb || !age) {
-      res.status(400).json({ error: 'Please provide both name and age' });
-      return;
-    }
-
-    // Validate that the age is a number
-    if (isNaN(age)) {
-      res.status(400).json({ error: 'Age must be a number' });
-      return;
-    }
-*/
-
-    if (
-      !mvNumb ||
-      !mvTitle ||
-      !yrMade ||
-      !mvType ||
-      !Crit ||
-      !MPAA ||
-      !Noms ||
-      !Awrd ||
-      !dirNumb
-    ) {
-      res.status(400).json({ error: "Please provide all information" });
-      return;
-    }
-
-    // Validate that the age is a number
-    if (isNaN(mvNumb)) {
-      res.status(400).json({ error: "Movie Number must be a number" });
-      return;
-    }
-    if (isNaN(yrMade)) {
-      res.status(400).json({ error: "Year Made must be a number" });
-      return;
-    }
-    if (isNaN(Crit)) {
-      res.status(400).json({ error: "No. Crits must be a number" });
-      return;
-    }
-    if (isNaN(Noms)) {
-      res.status(400).json({ error: "No. Nominations must be a number" });
-      return;
-    }
-    if (isNaN(Awrd)) {
-      res.status(400).json({ error: "No. Awards must be a number" });
-      return;
-    }
-    if (isNaN(dirNumb)) {
-      res
-        .status(400)
-        .json({ error: "Director Number Awards must be a number" });
-      return;
-    }
-    // Insert the data into MongoDB
-    //const result = await db.collection('Movie').insertOne({mvNumb, age });
-    const result = await db.collection("Movie").insertOne({
-      mvNumb,
-      mvTitle,
-      yrMade,
-      mvType,
-      Crit,
-      MPAA,
-      Noms,
-      Awrd,
-      dirNumb,
-    });
-
-    res.status(201).json({ id: result.insertedId });
+    // The push operator will create a bookings field if not already present. So convenient! Wow!!!
+    db.collection("listingsAndReviews").updateOne(
+      { _id: req.body.listingId },
+      {
+        $push: {
+          bookings: 
+            {...req.body.data, _id: new ObjectId()}
+        }
+      }
+    );
+    res.status(201);
   } catch (error) {
     next(error);
   }
@@ -187,4 +108,22 @@ const PORT = 3000;
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
+});
+
+
+
+
+
+
+// MY DATA ################################# DELETE LATER
+app.get("/api/test", async (req, res, next) => {
+  // const data = await db
+  //   .collection("listingsAndReviews")
+  //   .findOne({ name: "Be Happy in Porto" });
+  const data = await db
+    .collection("listingsAndReviews")
+    .distinct("property_type");
+  // const listings = db.collection("listingsAndReviews");
+  // const data = await listings.findOne({ name: "Be Happy in Porto" });
+  res.send(data);
 });

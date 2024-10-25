@@ -4,7 +4,9 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { ThreeDots } from "react-loader-spinner";
 import { Link } from "react-router-dom";
 
-interface Listing {
+const API_HOST = "http://localhost:3000";
+
+export interface Listing {
   _id: number;
   name: string;
   summary: string;
@@ -16,6 +18,18 @@ interface Listing {
   };
   bedrooms: number;
   propertyType: string;
+  bookings: Booking[];
+}
+
+interface Booking {
+  _id: string;
+  checkIn: Date;
+  checkOut: Date;
+  email: string;
+  name: string;
+  phone: string;
+  postalAddress: string;
+  residentialAddress: string;
 }
 
 const propertiesList = [
@@ -59,7 +73,6 @@ const propertiesList = [
 ];
 const bedroomsList = ["", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20];
 
-const API_HOST = "http://localhost:3000";
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);

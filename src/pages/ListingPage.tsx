@@ -3,18 +3,9 @@ import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { valDateInFuture } from "./BookingValidation";
+import { Listing } from "./HomePage";
 
 const API_HOST = "http://localhost:3000";
-
-interface Listing {
-  _id: number;
-  name: string;
-  summary: string;
-  price: number;
-  "review_scores.review_scores_rating": number;
-  bedrooms: number;
-  propertyType: string;
-}
 
 type Inputs = {
   checkIn: Date;
@@ -36,20 +27,21 @@ export default function ListingPage() {
     register,
     handleSubmit,
     formState: { errors },
-    getValues
-  } = useForm<Inputs>();
+    getValues,
+  } = useForm<Inputs>({ mode: "onChange" });
+  const currentDate = new Date();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    console.log(data);
-    // console.log({...data, listingId: id });
-    // axios.post("/api/data", {...data, listingId: id });
+    
+    // Send the data and the listing id
+    axios.post(API_HOST + "/api/data", { data: data, listingId: listing?._id });
   };
 
+  // initial loading in data
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await axios.get(API_HOST + "/api/data/" + id!.toString());
-        console.log(data);
         if (data.data === null) {
           navigate("/error");
         }
@@ -63,14 +55,40 @@ export default function ListingPage() {
   }, []);
 
   return (
-    <div className="container">
+    <div className="container pt-5">
       <div className="row">
         <div className="col">
           <h1>{listing?.name}</h1>
           <p>{listing?.summary}</p>
+          <div className="row">
+            <span>Daily rate: ${listing?.price.$numberDecimal}</span>
+            <span>
+              Customer rating: {listing?.review_scores.review_scores_rating}
+            </span>
+          </div>
+          <div className="row bookings">
+            <h2>Bookings</h2>
+            {listing?.bookings.map((booking, index) => {
+              const checkIn = new Date(booking.checkIn);
+              // Only display bookings that are after today
+              if (checkIn >= currentDate) {
+                return (
+                  <div className="booking">
+                    <h5>Booking {index + 1}</h5>
+                    <p>Start: {new Date(booking.checkIn).toDateString()}</p>
+                    <p>End: {new Date(booking.checkOut).toDateString()}</p>
+                  </div>
+                );
+              } else {
+                return null;
+              }
+            })}
+          </div>
         </div>
+
         <div className="col">
-          <form className="d-flex flex-column"
+          <form
+            className="d-flex flex-column"
             onSubmit={handleSubmit(onSubmit)}
           >
             <h3>Booking Details</h3>
@@ -97,7 +115,10 @@ export default function ListingPage() {
                   valueAsDate: true,
                   validate: {
                     valDateInFuture,
-                    inBeforeOut: (date: Date) => date > getValues().checkIn ? true : "Check in date must set be before the check out date",
+                    inBeforeOut: (date: Date) =>
+                      date >= getValues().checkIn
+                        ? true
+                        : "Check in date must set be before the check out date",
                   },
                 })}
               />
@@ -120,9 +141,10 @@ export default function ListingPage() {
                   required: requiredErrMsg,
                   pattern: {
                     // a regex found online for email validation (https://stackoverflow.com/questions/46155/how-can-i-validate-an-email-address-in-javascript)
-                    value: /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                    message: "Please enter a valid email address"
-                  }
+                    value:
+                      /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                    message: "Please enter a valid email address",
+                  },
                 })}
               />
               <span>{errors.email?.message?.toString()}</span>
@@ -135,8 +157,8 @@ export default function ListingPage() {
                   pattern: {
                     // a regex found online (https://stackoverflow.com/questions/22378736/regex-for-mobile-number-validation)
                     value: /^(\+\d{1,3}[- ]?)?\d{10}$/,
-                    message: "Please enter a valid phone number"
-                  }
+                    message: "Please enter a valid phone number",
+                  },
                 })}
               />
               <span>{errors.phone?.message?.toString()}</span>
