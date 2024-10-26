@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { valDateInFuture } from "./BookingValidation";
 import { Listing } from "./HomePage";
+import "./ListingPage.css"
 
 const API_HOST = "http://localhost:3000";
 

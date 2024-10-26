@@ -1,7 +1,4 @@
 import { Link, useLocation } from "react-router-dom";
-import { Booking } from "./ListingPage";
-import { Listing } from "./HomePage";
-
 
 export default function BookingSuccess() {
   const location = useLocation();

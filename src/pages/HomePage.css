@@ -7,16 +7,38 @@
   padding-block: 1rem;
 }
 
-.listing-search-form label {
-  padding: 0.5em;
+.listing-search-form {
   display: flex;
-  flex-direction: column;
-  flex: 1;
+  /* justify-content: center; */
+  align-items: center;
 }
 
-.listing-search-form input, select, button {
+.listing-search-form label {
+  padding: 0.5em;
+  padding-bottom: 0px;
+  display: flex;
+  flex-direction: column;
+  max-width: fit-content;
+}
+
+.listing-search-form label * {
   margin-top: 0.2em;
-  flex: 1;
+}
+
+#search-bar {
+  max-width: none; 
+  flex-grow: 1;
+}
+
+#search-bar input {
+  padding-block: 5px;
+  padding-inline: 20px;
+  border-radius: 20px;
+}
+
+.listing-search-form button {
+  /* max-height: fit-content; */
+  align-self: flex-end;
 }
 
 .listing-card {

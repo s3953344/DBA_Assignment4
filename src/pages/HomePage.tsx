@@ -11,10 +11,10 @@ export interface Listing {
   name: string;
   summary: string;
   price: {
-    "$numberDecimal": number
+    $numberDecimal: number;
   };
   review_scores: {
-    review_scores_rating: number
+    review_scores_rating: number;
   };
   bedrooms: number;
   propertyType: string;
@@ -73,7 +73,6 @@ const propertiesList = [
 ];
 const bedroomsList = ["", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20];
 
-
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<any>("");
@@ -121,7 +120,7 @@ export default function HomePage() {
     <div className="home-page container">
       <div className="top-section">
         <form onSubmit={handleSubmit} className="listing-search-form">
-          <label className="row">
+          <label id="search-bar">
             Location
             <input
               name="address.market"
@@ -130,24 +129,22 @@ export default function HomePage() {
               required
             />
           </label>
-          <div className="row">
-            <label className="column">
-              Bedrooms
-              <select id="bedrooms" name="bedrooms">
-                {bedroomsList.map((value) => {
-                  return <option value={value}>{value}</option>;
-                })}
-              </select>
-            </label>
-            <label className="column">
-              Property type
-              <select id="propertyType" name="property_type">
-                {propertiesList.map((value) => {
-                  return <option value={value}>{value}</option>;
-                })}
-              </select>
-            </label>
-          </div>
+          <label>
+            Bedrooms
+            <select id="bedrooms" name="bedrooms">
+              {bedroomsList.map((value) => {
+                return <option value={value}>{value}</option>;
+              })}
+            </select>
+          </label>
+          <label>
+            Property type
+            <select id="propertyType" name="property_type">
+              {propertiesList.map((value) => {
+                return <option value={value}>{value}</option>;
+              })}
+            </select>
+          </label>
           <button type="submit" className="btn btn-primary">
             Search
           </button>
@@ -197,8 +194,7 @@ export default function HomePage() {
   );
 }
 
-
-function ListingCard({ listing }: {listing: Listing}) {
+function ListingCard({ listing }: { listing: Listing }) {
   const price = listing.price.$numberDecimal;
   const rating = listing.review_scores.review_scores_rating;
 
@@ -208,8 +204,12 @@ function ListingCard({ listing }: {listing: Listing}) {
         <h3>{listing.name}</h3>
       </Link>
       <p>{listing.summary}</p>
-      <p><b>Daily price:</b> ${price ? price : "N/A"}</p>
-      <p><b>Customer rating:</b> {rating ? rating : "N/A"}</p>
+      <p>
+        <b>Daily price:</b> ${price ? price : "N/A"}
+      </p>
+      <p>
+        <b>Customer rating:</b> {rating ? rating : "N/A"}
+      </p>
     </div>
   );
 }
