@@ -55,7 +55,11 @@ app.get("/api/data", async (req, res, next) => {
     if (findQuery.bedrooms) {
       findQuery.bedrooms = parseInt(findQuery.bedrooms);
     }
-    // TODO: REMOVE THIS LIMIT!!!!
+    // make market search case-insensitive
+    if (findQuery['address.market']) {
+      findQuery['address.market'] = new RegExp(`^${req.query["address.market"]}$`, 'i');
+    }
+    // TODO: REMOVE THIS LIMIT!!!! Replace with pagination?
     const data = await db.collection("listingsAndReviews").find(findQuery).limit(5).toArray();
     res.json(data);
   } catch (error) {
@@ -66,7 +70,8 @@ app.get("/api/data", async (req, res, next) => {
 
 app.get("/api/data/:id", async (req, res, next) => {
   try {
-    const data = await db.collection("listingsAndReviews").findOne({_id: req.params.id});
+    const caseInsensitiveFind = new RegExp(`/^${req.params.id}$/i`);
+    const data = await db.collection("listingsAndReviews").findOne({_id: caseInsensitiveFind});
     res.json(data);
   } catch (error) {
     console.error("Failed to fetch data from MongoDB", error);

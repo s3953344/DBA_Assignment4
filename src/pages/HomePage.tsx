@@ -73,6 +73,29 @@ const propertiesList = [
 ];
 const bedroomsList = ["", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20];
 
+function Listings({ currentListings }: { currentListings: Listing[] }) {
+  return (
+    <div className="results-list">
+      <p>Found {currentListings.length} results</p>
+      {currentListings.map((listing) => {
+        return <ListingCard listing={listing} />;
+      })}
+    </div>
+  );
+}
+
+function PaginatedListings({ itemsPerPage }: {itemsPerPage: number}) {
+  const [itemOffset, setItemOffset] = useState(0);
+
+  // Simulate fetching items from another resources.
+  // (This could be items from props; or items loaded in a local state
+  // from an API endpoint with useEffect and useState)
+  // const endOffset = itemOffset + itemsPerPage;
+  // console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+  // const currentItems = items.slice(itemOffset, endOffset);
+  // const pageCount = Math.ceil(items.length / itemsPerPage);
+}
+
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<any>("");
@@ -179,15 +202,17 @@ export default function HomePage() {
             <i>{error.toString()}</i>
           </div>
         ) : searchResults.length === 0 ? (
-          <p>No results... Try changing your search options!</p>
+          <p>No results found... Try changing your search options!</p>
         ) : (
           // if all is well...
-          <div className="results-list">
-            <p>Found {searchResults.length} results</p>
-            {searchResults.map((listing) => {
-              return <ListingCard listing={listing} />;
-            })}
-          </div>
+          // <div className="results-list">
+          //   <p>Found {searchResults.length} results</p>
+          //   {searchResults.map((listing) => {
+          //     return <ListingCard listing={listing} />;
+          //   })}
+          // </div>
+
+          <Listings currentListings={searchResults} />
         )}
       </div>
     </div>
