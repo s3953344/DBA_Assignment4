@@ -41,13 +41,11 @@ export default function ListingPage() {
     },
     resetOptions: { keepIsValid: true },
   });
-  const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
   const [formSubmitErr, setFormSubmitErr] = useState<string>("");
 
   const currentDate = new Date();
 
   const onSubmit: SubmitHandler<Booking> = (data) => {
-    // setDisableSubmit(true);
     setFormSubmitErr("");
     // reset();
     try {
@@ -84,7 +82,7 @@ export default function ListingPage() {
 
   return (
     <div className="container pt-5">
-      <div className="row mb-3">
+      <div className="mb-3">
         <Link to="/">Home</Link>
       </div>
       <div className="row">
@@ -220,7 +218,7 @@ export default function ListingPage() {
               />
               <span>{errors.residentialAddress?.message?.toString()}</span>
             </label>
-            <button type="submit" disabled={disableSubmit}>
+            <button type="submit">
               Submit
             </button>
             <span>{formSubmitErr}</span>

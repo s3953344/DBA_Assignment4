@@ -80,7 +80,6 @@ const bedroomsList = ["", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20];
 function Listings({ currentListings, totalCount }: { currentListings: Listing[], totalCount: number }) {
   return (
     <div className="results-list">
-      <p>Found {totalCount} results</p>
       {currentListings.map((listing) => {
         return <ListingCard key={listing._id} listing={listing} />;
       })}
@@ -96,7 +95,7 @@ export default function HomePage() {
   const [itemOffset, setItemOffset] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const itemsPerPage = 4; // Number of items per page
+  const itemsPerPage = 8; // Number of items per page
 
   useEffect(() => {
     const fetchData = async () => {
@@ -232,6 +231,7 @@ export default function HomePage() {
           <p>No results found... Try changing your search options!</p>
         ) : (
           <div>
+            <p>Found {totalCount} results</p>
             <ReactPaginate
               nextLabel="next >"
               onPageChange={handlePageClick}
@@ -285,6 +285,12 @@ function ListingCard({ listing }: { listing: Listing }) {
       </p>
       <p>
         <b>Customer rating:</b> {rating ? rating : "N/A"}
+      </p>
+      <p>
+        <b>Property Type:</b> {listing.propertyType ? listing.propertyType : "N/A"}
+      </p>
+      <p>
+        <b>Bedrooms:</b> {listing.bedrooms ? listing.bedrooms : "N/A"}
       </p>
     </div>
   );

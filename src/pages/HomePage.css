@@ -55,12 +55,26 @@
   text-decoration: underline;
 }
 
+.results-list {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+
+/* pagination */
 .pagination-link {
   padding: 0.5em;
+}
+
+.pagination-item, .next, .previous, .break {
+  border: 1px solid gray;
+  padding: 0.2em;
 }
 
 .active {
   text-decoration: underline;
   font-weight: bold;
   background-color: cornflowerblue;
+}
+.active a {
+  color: white;
 }
