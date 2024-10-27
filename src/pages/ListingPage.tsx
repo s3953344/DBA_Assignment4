@@ -83,7 +83,7 @@ export default function ListingPage() {
   return (
     <div className="listing-page container p-4">
       <div className="row mb-3 px-5 mt-3">
-        <Link to="/">Home</Link>
+        <Link to="/">{"<"} Home</Link>
       </div>
       <div className="row">
         <div className="col px-5">
