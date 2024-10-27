@@ -54,3 +54,13 @@
 .listing-card h3 {
   text-decoration: underline;
 }
+
+.pagination-link {
+  padding: 0.5em;
+}
+
+.active {
+  text-decoration: underline;
+  font-weight: bold;
+  background-color: cornflowerblue;
+}

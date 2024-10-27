@@ -3,6 +3,7 @@ import "./HomePage.css";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { ThreeDots } from "react-loader-spinner";
 import { Link } from "react-router-dom";
+import ReactPaginate from "react-paginate";
 
 const API_HOST = "http://localhost:3000";
 
@@ -20,8 +21,8 @@ export interface Listing {
   propertyType: string;
   bookings: Booking[];
   address: {
-    market: string
-  }
+    market: string;
+  };
 }
 
 interface Booking {
@@ -81,7 +82,7 @@ function Listings({ currentListings }: { currentListings: Listing[] }) {
     <div className="results-list">
       <p>Found {currentListings.length} results</p>
       {currentListings.map((listing) => {
-        return <ListingCard listing={listing} />;
+        return <ListingCard key={listing._id} listing={listing} />;
       })}
     </div>
   );
@@ -92,6 +93,8 @@ export default function HomePage() {
   const [error, setError] = useState<any>("");
   // todo: change to match with actual field names
   const [searchResults, setSearchResults] = useState<Listing[]>([]);
+  const [itemOffset, setItemOffset] = useState(0);
+  const itemsPerPage = 10; // Number of items per pag
 
   useEffect(() => {
     const fetchData = async () => {
@@ -99,7 +102,6 @@ export default function HomePage() {
         setIsLoading(true);
         const data: any = await axios.get(API_HOST + "/api/data");
         setSearchResults(data.data);
-        // console.log(data.data[0]);
       } catch (err: any) {
         setError(err);
       } finally {
@@ -110,8 +112,25 @@ export default function HomePage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const data: any = await axios.get(API_HOST + "/api/data?offset=12");
+        setSearchResults(data.data);
+      } catch (err: any) {
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [itemOffset]);
+
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
+    
     try {
       setIsLoading(true);
       const formData = new FormData(e.target as HTMLFormElement);
@@ -130,6 +149,12 @@ export default function HomePage() {
     }
   };
 
+  const handlePageClick = (event: {selected: number}) => {
+    const newOffset = (event.selected * itemsPerPage) % 5555;
+    setItemOffset(newOffset);
+    console.log(`Clicked page ${event.selected} which is offset ${newOffset}`);
+  };
+
   return (
     <div className="home-page container">
       <div className="top-section">
@@ -146,16 +171,16 @@ export default function HomePage() {
           <label>
             Bedrooms
             <select id="bedrooms" name="bedrooms">
-              {bedroomsList.map((value) => {
-                return <option value={value}>{value}</option>;
+              {bedroomsList.map((value, index) => {
+                return <option key={index} value={value}>{value}</option>;
               })}
             </select>
           </label>
           <label>
             Property type
             <select id="propertyType" name="property_type">
-              {propertiesList.map((value) => {
-                return <option value={value}>{value}</option>;
+              {propertiesList.map((value, index) => {
+                return <option key={index} value={value}>{value}</option>;
               })}
             </select>
           </label>
@@ -195,7 +220,21 @@ export default function HomePage() {
         ) : searchResults.length === 0 ? (
           <p>No results found... Try changing your search options!</p>
         ) : (
-          <Listings currentListings={searchResults} />
+          <div>
+            <Listings currentListings={searchResults} />
+            <ReactPaginate
+              nextLabel="next >"
+              onPageChange={handlePageClick}
+              pageRangeDisplayed={2}
+              pageCount={111}
+              previousLabel="< previous"
+              renderOnZeroPageCount={null}
+              containerClassName="pagination"
+              pageClassName="pagination-item"
+              pageLinkClassName="pagination-link"
+              activeClassName="active"
+            />
+          </div>
         )}
       </div>
     </div>
@@ -213,7 +252,8 @@ function ListingCard({ listing }: { listing: Listing }) {
       </Link>
       <p>{listing.summary}</p>
       <p>
-        <b>Location:</b> {listing.address.market ? listing.address.market : "N/A"}
+        <b>Location:</b>{" "}
+        {listing.address.market ? listing.address.market : "N/A"}
       </p>
       <p>
         <b>Daily price:</b> ${price ? price : "N/A"}

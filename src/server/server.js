@@ -72,8 +72,11 @@ app.get("/api/data", async (req, res, next) => {
       );
     }
 
+    const limit = req.query.limit ? parseInt(req.query.limit) : 4;
+    const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+
     // TODO: REMOVE THIS LIMIT!!!! Replace with pagination?
-    const data = await db.collection("listingsAndReviews").find(findQuery).limit(5).toArray();
+    const data = await db.collection("listingsAndReviews").find(findQuery).skip(offset).limit(limit).toArray();
     res.json(data);
   } catch (error) {
     console.error("Failed to fetch data from MongoDB", error);
