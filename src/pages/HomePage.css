@@ -55,12 +55,18 @@
   text-decoration: underline;
 }
 
-.results-list {
+.results-list, .listing-stats {
   display: grid;
   grid-template-columns: 50% 50%;
+  padding: 0.2rem;
+  margin: 0.2rem;
 }
 
 /* pagination */
+.pagination {
+  justify-content: center;
+}
+
 .pagination-link {
   padding: 0.5em;
 }

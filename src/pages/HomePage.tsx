@@ -101,9 +101,13 @@ export default function HomePage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const response: any = await axios.get(`${API_HOST}/api/data?limit=${itemsPerPage}`);
+        const response: any = await axios.get(
+          `${API_HOST}/api/data?limit=${itemsPerPage}`
+        );
         setSearchResults(response.data);
-        const countResponse: any = await axios.get(`${API_HOST}/api/data/count`);
+        const countResponse: any = await axios.get(
+          `${API_HOST}/api/data/count`
+        );
         setTotalCount(countResponse.data);
       } catch (err: any) {
         setError(err);
@@ -119,7 +123,9 @@ export default function HomePage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const data: any = await axios.get(`${API_HOST}/api/data?offset=${itemOffset}&limit=${itemsPerPage}&${currSearchParams}`);
+        const data: any = await axios.get(
+          `${API_HOST}/api/data?offset=${itemOffset}&limit=${itemsPerPage}&${currSearchParams}`
+        );
         setSearchResults(data.data);
       } catch (err: any) {
         setError(err);
@@ -133,7 +139,7 @@ export default function HomePage() {
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    
+
     try {
       setIsLoading(true);
       const formData = new FormData(e.target as HTMLFormElement);
@@ -145,7 +151,9 @@ export default function HomePage() {
         API_HOST + "/api/data?" + searchParamsString
       );
       setSearchResults(data.data);
-      const countResponse: any = await axios.get(`${API_HOST}/api/data/count?${searchParamsString}`)
+      const countResponse: any = await axios.get(
+        `${API_HOST}/api/data/count?${searchParamsString}`
+      );
       setCurrentPage(0);
       setTotalCount(countResponse.data);
     } catch (err: any) {
@@ -156,7 +164,7 @@ export default function HomePage() {
     }
   };
 
-  const handlePageClick = (event: {selected: number}) => {
+  const handlePageClick = (event: { selected: number }) => {
     // TODO: add actual count func
     const newOffset = (event.selected * itemsPerPage) % 5555;
     setItemOffset(newOffset);
@@ -181,7 +189,11 @@ export default function HomePage() {
             Bedrooms
             <select id="bedrooms" name="bedrooms">
               {bedroomsList.map((value, index) => {
-                return <option key={index} value={value}>{value}</option>;
+                return (
+                  <option key={index} value={value}>
+                    {value}
+                  </option>
+                );
               })}
             </select>
           </label>
@@ -189,7 +201,11 @@ export default function HomePage() {
             Property type
             <select id="property_type" name="property_type">
               {propertiesList.map((value, index) => {
-                return <option key={index} value={value}>{value}</option>;
+                return (
+                  <option key={index} value={value}>
+                    {value}
+                  </option>
+                );
               })}
             </select>
           </label>
@@ -270,27 +286,19 @@ function ListingCard({ listing }: { listing: Listing }) {
   const rating = listing.review_scores.review_scores_rating;
 
   return (
-    <div className="listing-card">
+    <div className="listing-card pt-5">
       <Link to={"listing/" + listing._id}>
         <h3>{listing.name}</h3>
       </Link>
       <p>{listing.summary}</p>
-      <p>
-        <b>Location:</b>{" "}
-        {listing.address.market ? listing.address.market : "N/A"}
-      </p>
-      <p>
-        <b>Daily price:</b> ${price ? price : "N/A"}
-      </p>
-      <p>
-        <b>Customer rating:</b> {rating ? rating : "N/A"}
-      </p>
-      <p>
-        <b>Property Type:</b> {listing.property_type ? listing.property_type : "N/A"}
-      </p>
-      <p>
-        <b>Bedrooms:</b> {listing.bedrooms ? listing.bedrooms : "N/A"}
-      </p>
+
+      <div className="listing-stats">
+        <b>Location:</b> <p>{listing.address.market ? listing.address.market : "N/A"}</p>
+        <b>Daily price:</b> <p>${price ? price : "N/A"}</p>
+        <b>Customer rating:</b> <p>{rating ? rating : "N/A"}</p>
+        <b>Property Type:</b> <p>{listing.property_type ? listing.property_type : "N/A"}</p>
+        <b>Bedrooms:</b> <p>{listing.bedrooms ? listing.bedrooms : "N/A"}</p>
+      </div>
     </div>
   );
 }

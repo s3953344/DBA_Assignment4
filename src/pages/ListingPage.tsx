@@ -32,13 +32,13 @@ export default function ListingPage() {
     reset,
   } = useForm<Booking>({
     mode: "onChange",
-    defaultValues: {
-      name: "DEFAULT",
-      email: "DEFAULT@gmail.com",
-      phone: "0000000000",
-      postalAddress: "DEFAULT",
-      residentialAddress: "DEFAULT",
-    },
+    // defaultValues: {
+    //   name: "DEFAULT",
+    //   email: "DEFAULT@gmail.com",
+    //   phone: "0000000000",
+    //   postalAddress: "DEFAULT",
+    //   residentialAddress: "DEFAULT",
+    // },
     resetOptions: { keepIsValid: true },
   });
   const [formSubmitErr, setFormSubmitErr] = useState<string>("");
@@ -98,7 +98,7 @@ export default function ListingPage() {
           <div className="row bookings">
             <h2>Bookings</h2>
             {listing?.bookings === undefined
-              ? <p>"No bookings yet!"</p>
+              ? <p>No bookings yet!</p>
               : listing?.bookings.map((booking, index) => {
                   const checkIn = new Date(booking.checkIn);
                   // Only display bookings that are after today
