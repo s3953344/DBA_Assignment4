@@ -80,7 +80,7 @@ app.get("/api/data", async (req, res, next) => {
     const offset = req.query.offset ? parseInt(req.query.offset) : 0;
     
     // for some reason, X-Total-Count does not show up as a header
-    // so AAAAAAAAAAA
+    // so AAAAAAAAAAAHHHH
     // const count = await db.collection("listingsAndReviews").countDocuments(findQuery);
     const data = await db.collection("listingsAndReviews").find(findQuery).skip(offset).limit(limit).toArray();
     // res.status(200).set("X-Total-Count", count.toString()).json(data);
@@ -157,22 +157,4 @@ const PORT = 3000;
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
-});
-
-
-
-
-
-
-// MY DATA ################################# DELETE LATER
-app.get("/api/test", async (req, res, next) => {
-  // const data = await db
-  //   .collection("listingsAndReviews")
-  //   .findOne({ name: "Be Happy in Porto" });
-  const data = await db
-    .collection("listingsAndReviews")
-    .distinct("property_type");
-  // const listings = db.collection("listingsAndReviews");
-  // const data = await listings.findOne({ name: "Be Happy in Porto" });
-  res.send(data);
 });

@@ -69,11 +69,9 @@ export default function ListingPage() {
     const fetchData = async () => {
       try {
         const data = await axios.get(API_HOST + "/api/data/" + id!.toString());
-        // if (!data.data.bookings) { data.data.bookings = [] }
         setListing(data.data);
       } catch (err) {
         console.log(err);
-        // navigate("/error");
       }
     };
 

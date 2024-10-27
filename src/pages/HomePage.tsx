@@ -165,8 +165,7 @@ export default function HomePage() {
   };
 
   const handlePageClick = (event: { selected: number }) => {
-    // TODO: add actual count func
-    const newOffset = (event.selected * itemsPerPage) % 5555;
+    const newOffset = (event.selected * itemsPerPage) % totalCount;
     setItemOffset(newOffset);
     setCurrentPage(event.selected);
     console.log(`Clicked page ${event.selected} which is offset ${newOffset}`);
