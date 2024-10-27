@@ -19,6 +19,9 @@ export interface Listing {
   bedrooms: number;
   propertyType: string;
   bookings: Booking[];
+  address: {
+    market: string
+  }
 }
 
 interface Booking {
@@ -82,18 +85,6 @@ function Listings({ currentListings }: { currentListings: Listing[] }) {
       })}
     </div>
   );
-}
-
-function PaginatedListings({ itemsPerPage }: {itemsPerPage: number}) {
-  const [itemOffset, setItemOffset] = useState(0);
-
-  // Simulate fetching items from another resources.
-  // (This could be items from props; or items loaded in a local state
-  // from an API endpoint with useEffect and useState)
-  // const endOffset = itemOffset + itemsPerPage;
-  // console.log(`Loading items from ${itemOffset} to ${endOffset}`);
-  // const currentItems = items.slice(itemOffset, endOffset);
-  // const pageCount = Math.ceil(items.length / itemsPerPage);
 }
 
 export default function HomePage() {
@@ -204,14 +195,6 @@ export default function HomePage() {
         ) : searchResults.length === 0 ? (
           <p>No results found... Try changing your search options!</p>
         ) : (
-          // if all is well...
-          // <div className="results-list">
-          //   <p>Found {searchResults.length} results</p>
-          //   {searchResults.map((listing) => {
-          //     return <ListingCard listing={listing} />;
-          //   })}
-          // </div>
-
           <Listings currentListings={searchResults} />
         )}
       </div>
@@ -229,6 +212,9 @@ function ListingCard({ listing }: { listing: Listing }) {
         <h3>{listing.name}</h3>
       </Link>
       <p>{listing.summary}</p>
+      <p>
+        <b>Location:</b> {listing.address.market ? listing.address.market : "N/A"}
+      </p>
       <p>
         <b>Daily price:</b> ${price ? price : "N/A"}
       </p>

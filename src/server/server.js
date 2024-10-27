@@ -44,21 +44,34 @@ app.get("/add", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "add.html"));
 });
 
+function formatGetReq(req) {
+  const findQuery = {};
+  if (req.query.bedrooms) { findQuery.bedrooms = parseInt(req.query.bedrooms) }
+  if (req.query.property_type) { findQuery.bedrooms = req.query.property_type }
+  // make market search case-insensitive
+  if (req.query["address.market"]) {
+    findQuery["address.market"] = new RegExp(
+      `^${req.query["address.market"]}$`,
+      "i"
+    );
+  }
+  return findQuery;
+}
+
 // API endpoint
 app.get("/api/data", async (req, res, next) => {
   try {
-    // Do not include any blank fields in the given query param
     const findQuery = {};
-    for (const property in req.query) {
-      if (req.query[property] != "") { findQuery[property] = req.query[property] }
-    }
-    if (findQuery.bedrooms) {
-      findQuery.bedrooms = parseInt(findQuery.bedrooms);
-    }
+    if (req.query.bedrooms) { findQuery.bedrooms = parseInt(req.query.bedrooms) }
+    if (req.query.property_type) { findQuery.bedrooms = req.query.property_type }
     // make market search case-insensitive
-    if (findQuery['address.market']) {
-      findQuery['address.market'] = new RegExp(`^${req.query["address.market"]}$`, 'i');
+    if (req.query["address.market"]) {
+      findQuery["address.market"] = new RegExp(
+        `^${req.query["address.market"]}$`,
+        "i"
+      );
     }
+
     // TODO: REMOVE THIS LIMIT!!!! Replace with pagination?
     const data = await db.collection("listingsAndReviews").find(findQuery).limit(5).toArray();
     res.json(data);
@@ -70,8 +83,7 @@ app.get("/api/data", async (req, res, next) => {
 
 app.get("/api/data/:id", async (req, res, next) => {
   try {
-    const caseInsensitiveFind = new RegExp(`/^${req.params.id}$/i`);
-    const data = await db.collection("listingsAndReviews").findOne({_id: caseInsensitiveFind});
+    const data = await db.collection("listingsAndReviews").findOne({_id: req.params.id});
     res.json(data);
   } catch (error) {
     console.error("Failed to fetch data from MongoDB", error);
