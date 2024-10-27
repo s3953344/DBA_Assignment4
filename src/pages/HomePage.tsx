@@ -93,7 +93,8 @@ export default function HomePage() {
   const [error, setError] = useState<any>("");
   // todo: change to match with actual field names
   const [searchResults, setSearchResults] = useState<Listing[]>([]);
-  const [itemOffset, setItemOffset] = useState(0);
+  const [itemOffset, setItemOffset] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const itemsPerPage = 10; // Number of items per pag
 
   useEffect(() => {
@@ -116,7 +117,8 @@ export default function HomePage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const data: any = await axios.get(API_HOST + "/api/data?offset=12");
+        // TODO: add search params as well
+        const data: any = await axios.get(`${API_HOST}/api/data?offset=${itemOffset}&limit=${itemsPerPage}`);
         setSearchResults(data.data);
       } catch (err: any) {
         setError(err);
@@ -150,8 +152,10 @@ export default function HomePage() {
   };
 
   const handlePageClick = (event: {selected: number}) => {
+    // TODO: add actual count func
     const newOffset = (event.selected * itemsPerPage) % 5555;
     setItemOffset(newOffset);
+    setCurrentPage(event.selected);
     console.log(`Clicked page ${event.selected} which is offset ${newOffset}`);
   };
 
@@ -233,6 +237,7 @@ export default function HomePage() {
               pageClassName="pagination-item"
               pageLinkClassName="pagination-link"
               activeClassName="active"
+              initialPage={currentPage}
             />
           </div>
         )}
