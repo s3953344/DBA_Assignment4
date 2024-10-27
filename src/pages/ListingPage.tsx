@@ -81,22 +81,23 @@ export default function ListingPage() {
   }, []);
 
   return (
-    <div className="container pt-5">
-      <div className="mb-3">
+    <div className="listing-page container p-4">
+      <div className="row mb-3 px-5 mt-3">
         <Link to="/">Home</Link>
       </div>
       <div className="row">
-        <div className="col">
-          <h1>{listing?.name}</h1>
+        <div className="col px-5">
+          <h1 className="mb-3">{listing?.name}</h1>
           <p>{listing?.summary}</p>
-          <div className="row">
-            <span>Daily rate: ${listing?.price.$numberDecimal}</span>
+          <div className="d-flex justify-content-evenly mb-3">
+            <span><b>Daily rate: </b>${listing?.price.$numberDecimal}</span>
             <span>
-              Customer rating: {listing?.review_scores.review_scores_rating}
+              <b>Customer rating: </b>{listing?.review_scores.review_scores_rating}
             </span>
           </div>
-          <div className="row bookings">
-            <h2>Bookings</h2>
+          <h2>Bookings</h2>
+          {/* ###### BOOKINGS ####### */}
+          <div className="row bookings shadow p-3">
             {listing?.bookings === undefined
               ? <p>No bookings yet!</p>
               : listing?.bookings.map((booking, index) => {
@@ -123,44 +124,46 @@ export default function ListingPage() {
           </div>
         </div>
 
-        <div className="col">
+        <div className="col px-5">
           <form
-            className="d-flex flex-column"
+            className="booking-form shadow d-flex flex-column gap-1 p-3"
             onSubmit={handleSubmit(onSubmit)}
           >
             <h3>Booking Details</h3>
-            <label>
-              Check in
-              <input
-                type="date"
-                {...register("checkIn", {
-                  required: requiredErrMsg,
-                  valueAsDate: true,
-                  validate: {
-                    valDateInFuture,
-                  },
-                })}
-              />
-              <span>{errors.checkIn?.message?.toString()}</span>
-            </label>
-            <label>
-              Check out
-              <input
-                type="date"
-                {...register("checkOut", {
-                  required: requiredErrMsg,
-                  valueAsDate: true,
-                  validate: {
-                    valDateInFuture,
-                    inBeforeOut: (date: Date) =>
-                      date >= getValues().checkIn
-                        ? true
-                        : "Check out must be after check in day",
-                  },
-                })}
-              />
-              <span>{errors.checkOut?.message?.toString()}</span>
-            </label>
+            <div className="two-column-grid">
+              <label>
+                Check in
+                <input
+                  type="date"
+                  {...register("checkIn", {
+                    required: requiredErrMsg,
+                    valueAsDate: true,
+                    validate: {
+                      valDateInFuture,
+                    },
+                  })}
+                />
+                <span>{errors.checkIn?.message?.toString()}</span>
+              </label>
+              <label>
+                Check out
+                <input
+                  type="date"
+                  {...register("checkOut", {
+                    required: requiredErrMsg,
+                    valueAsDate: true,
+                    validate: {
+                      valDateInFuture,
+                      inBeforeOut: (date: Date) =>
+                        date >= getValues().checkIn
+                          ? true
+                          : "Check out must be after check in day",
+                    },
+                  })}
+                />
+                <span>{errors.checkOut?.message?.toString()}</span>
+              </label>
+            </div>
             <h3>Your Details</h3>
             <label>
               Your name
@@ -171,35 +174,37 @@ export default function ListingPage() {
               />
               <span>{errors.name?.message?.toString()}</span>
             </label>
-            <label>
-              Email address
-              <input
-                {...register("email", {
-                  required: requiredErrMsg,
-                  pattern: {
-                    // a regex found online for email validation (https://stackoverflow.com/questions/46155/how-can-i-validate-an-email-address-in-javascript)
-                    value:
-                      /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                    message: "Please enter a valid email address",
-                  },
-                })}
-              />
-              <span>{errors.email?.message?.toString()}</span>
-            </label>
-            <label>
-              Phone number
-              <input
-                {...register("phone", {
-                  required: requiredErrMsg,
-                  pattern: {
-                    // a regex found online (https://stackoverflow.com/questions/22378736/regex-for-mobile-number-validation)
-                    value: /^(\+\d{1,3}[- ]?)?\d{10}$/,
-                    message: "Please enter a valid phone number",
-                  },
-                })}
-              />
-              <span>{errors.phone?.message?.toString()}</span>
-            </label>
+            <div className="two-column-grid">
+              <label>
+                Email address
+                <input
+                  {...register("email", {
+                    required: requiredErrMsg,
+                    pattern: {
+                      // a regex found online for email validation (https://stackoverflow.com/questions/46155/how-can-i-validate-an-email-address-in-javascript)
+                      value:
+                        /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                      message: "Please enter a valid email address",
+                    },
+                  })}
+                />
+                <span>{errors.email?.message?.toString()}</span>
+              </label>
+              <label>
+                Phone number
+                <input
+                  {...register("phone", {
+                    required: requiredErrMsg,
+                    pattern: {
+                      // a regex found online (https://stackoverflow.com/questions/22378736/regex-for-mobile-number-validation)
+                      value: /^(\+\d{1,3}[- ]?)?\d{10}$/,
+                      message: "Please enter a valid phone number",
+                    },
+                  })}
+                />
+                <span>{errors.phone?.message?.toString()}</span>
+              </label>
+            </div>
             <label>
               Postal address
               <input
