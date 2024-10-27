@@ -77,7 +77,7 @@ const propertiesList = [
 ];
 const bedroomsList = ["", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20];
 
-function Listings({ currentListings, totalCount }: { currentListings: Listing[], totalCount: number }) {
+function Listings({ currentListings }: { currentListings: Listing[] }) {
   return (
     <div className="results-list">
       {currentListings.map((listing) => {
@@ -105,7 +105,6 @@ export default function HomePage() {
         console.log(response);
         setSearchResults(response.data);
         const countResponse: any = await axios.get(`${API_HOST}/api/data/count`);
-        console.log(countResponse);
         setTotalCount(countResponse.data);
       } catch (err: any) {
         setError(err);
@@ -123,8 +122,6 @@ export default function HomePage() {
         setIsLoading(true);
         const data: any = await axios.get(`${API_HOST}/api/data?offset=${itemOffset}&limit=${itemsPerPage}&${currSearchParams}`);
         setSearchResults(data.data);
-        const countResponse: any = await axios.get(`${API_HOST}/api/data/count?${currSearchParams}`)
-        setTotalCount(countResponse.data);
       } catch (err: any) {
         setError(err);
       } finally {
@@ -149,6 +146,8 @@ export default function HomePage() {
         API_HOST + "/api/data?" + searchParamsString
       );
       setSearchResults(data.data);
+      const countResponse: any = await axios.get(`${API_HOST}/api/data/count?${searchParamsString}`)
+      setTotalCount(countResponse.data);
     } catch (err: any) {
       console.log(err);
       setError(err);
@@ -245,7 +244,7 @@ export default function HomePage() {
               activeClassName="active"
               initialPage={currentPage}
             />
-            <Listings currentListings={searchResults} totalCount={totalCount} />
+            <Listings currentListings={searchResults} />
             <ReactPaginate
               nextLabel="next >"
               onPageChange={handlePageClick}
