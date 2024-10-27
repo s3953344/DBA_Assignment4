@@ -50,7 +50,7 @@ app.get("/add", (req, res) => {
 function formatGetReq(req) {
   const findQuery = {};
   if (req.query.bedrooms) { findQuery.bedrooms = parseInt(req.query.bedrooms) }
-  if (req.query.property_type) { findQuery.bedrooms = req.query.property_type }
+  if (req.query.property_type) { findQuery.property_type = req.query.property_type }
   // make market search case-insensitive
   if (req.query["address.market"]) {
     findQuery["address.market"] = new RegExp(
@@ -66,7 +66,7 @@ app.get("/api/data", async (req, res, next) => {
   try {
     const findQuery = {};
     if (req.query.bedrooms) { findQuery.bedrooms = parseInt(req.query.bedrooms) }
-    if (req.query.property_type) { findQuery.bedrooms = req.query.property_type }
+    if (req.query.property_type) { findQuery.property_type = req.query.property_type }
     // make market search case-insensitive
     if (req.query["address.market"]) {
       findQuery["address.market"] = new RegExp(
@@ -74,17 +74,17 @@ app.get("/api/data", async (req, res, next) => {
         "i"
       );
     }
-
     
-    // default limit to 4
-    const limit = req.query.limit ? parseInt(req.query.limit) : 4;
+    // default limit to 8
+    const limit = req.query.limit ? parseInt(req.query.limit) : 8;
     const offset = req.query.offset ? parseInt(req.query.offset) : 0;
     
     // for some reason, X-Total-Count does not show up as a header
     // so AAAAAAAAAAA
     // const count = await db.collection("listingsAndReviews").countDocuments(findQuery);
     const data = await db.collection("listingsAndReviews").find(findQuery).skip(offset).limit(limit).toArray();
-    res.status(200).set("X-Total-Count", count.toString()).json(data);
+    // res.status(200).set("X-Total-Count", count.toString()).json(data);
+    res.status(200).json(data);
   } catch (error) {
     console.error("Failed to fetch data from MongoDB", error);
     next(error);
@@ -96,7 +96,7 @@ app.get("/api/data/count", async (req, res, next) => {
   try {
     const findQuery = {};
     if (req.query.bedrooms) { findQuery.bedrooms = parseInt(req.query.bedrooms) }
-    if (req.query.property_type) { findQuery.bedrooms = req.query.property_type }
+    if (req.query.property_type) { findQuery.property_type = req.query.property_type }
     // make market search case-insensitive
     if (req.query["address.market"]) {
       findQuery["address.market"] = new RegExp(
@@ -104,9 +104,9 @@ app.get("/api/data/count", async (req, res, next) => {
         "i"
       );
     }
-
+    
     const count = await db.collection("listingsAndReviews").countDocuments(findQuery);
-    res.status(200).set("X-Total-Count", count.toString()).json(count);
+    res.status(200).json(count);
   } catch (error) {
     console.error("Failed to fetch data from MongoDB", error);
     next(error);

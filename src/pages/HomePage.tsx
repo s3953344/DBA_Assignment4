@@ -18,7 +18,7 @@ export interface Listing {
     review_scores_rating: number;
   };
   bedrooms: number;
-  propertyType: string;
+  property_type: string;
   bookings: Booking[];
   address: {
     market: string;
@@ -102,7 +102,6 @@ export default function HomePage() {
       try {
         setIsLoading(true);
         const response: any = await axios.get(`${API_HOST}/api/data?limit=${itemsPerPage}`);
-        console.log(response);
         setSearchResults(response.data);
         const countResponse: any = await axios.get(`${API_HOST}/api/data/count`);
         setTotalCount(countResponse.data);
@@ -147,6 +146,7 @@ export default function HomePage() {
       );
       setSearchResults(data.data);
       const countResponse: any = await axios.get(`${API_HOST}/api/data/count?${searchParamsString}`)
+      setCurrentPage(0);
       setTotalCount(countResponse.data);
     } catch (err: any) {
       console.log(err);
@@ -187,7 +187,7 @@ export default function HomePage() {
           </label>
           <label>
             Property type
-            <select id="propertyType" name="property_type">
+            <select id="property_type" name="property_type">
               {propertiesList.map((value, index) => {
                 return <option key={index} value={value}>{value}</option>;
               })}
@@ -286,7 +286,7 @@ function ListingCard({ listing }: { listing: Listing }) {
         <b>Customer rating:</b> {rating ? rating : "N/A"}
       </p>
       <p>
-        <b>Property Type:</b> {listing.propertyType ? listing.propertyType : "N/A"}
+        <b>Property Type:</b> {listing.property_type ? listing.property_type : "N/A"}
       </p>
       <p>
         <b>Bedrooms:</b> {listing.bedrooms ? listing.bedrooms : "N/A"}

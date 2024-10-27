@@ -67,7 +67,8 @@
 
 .pagination-item, .next, .previous, .break {
   border: 1px solid gray;
-  padding: 0.2em;
+  padding: 0.4em;
+  padding-inline: 0.6em;
 }
 
 .active {
