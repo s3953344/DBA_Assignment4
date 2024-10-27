@@ -1,10 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { valDateInFuture } from "./BookingValidation";
 import { Listing } from "./HomePage";
-import "./ListingPage.css"
+import "./ListingPage.css";
 
 const API_HOST = "http://localhost:3000";
 
@@ -30,13 +30,17 @@ export default function ListingPage() {
     formState: { errors },
     getValues,
     reset,
-  } = useForm<Booking>({ mode: "onChange" , defaultValues: {
-    name: "DEFAULT",
-    email: "DEFAULT@gmail.com",
-    phone: "0000000000",
-    postalAddress: "DEFAULT",
-    residentialAddress: "DEFAULT"
-  }, resetOptions: {keepIsValid: true}});
+  } = useForm<Booking>({
+    mode: "onChange",
+    defaultValues: {
+      name: "DEFAULT",
+      email: "DEFAULT@gmail.com",
+      phone: "0000000000",
+      postalAddress: "DEFAULT",
+      residentialAddress: "DEFAULT",
+    },
+    resetOptions: { keepIsValid: true },
+  });
   const [disableSubmit, setDisableSubmit] = useState<boolean>(false);
   const [formSubmitErr, setFormSubmitErr] = useState<string>("");
 
@@ -48,11 +52,17 @@ export default function ListingPage() {
     // reset();
     try {
       // Send the data and the listing id
-      axios.post(API_HOST + "/api/data", { data: data, listingId: listing?._id });
-      navigate("/bookingsuccess", {state: {booking: data, listing}});
+      axios.post(API_HOST + "/api/data", {
+        data: data,
+        listingId: listing?._id,
+      });
+      navigate("/bookingsuccess", { state: { booking: data, listing } });
     } catch (err) {
-      console.log("error!!")
-      setFormSubmitErr("Form submission failed. Are you sure the server is running? Make sure to run 'npm run mongo' in the root directory.\n" + err);
+      console.log("error!!");
+      setFormSubmitErr(
+        "Form submission failed. Are you sure the server is running? Make sure to run 'npm run mongo' in the root directory.\n" +
+          err
+      );
     }
   };
 
@@ -61,6 +71,7 @@ export default function ListingPage() {
     const fetchData = async () => {
       try {
         const data = await axios.get(API_HOST + "/api/data/" + id!.toString());
+        // if (!data.data.bookings) { data.data.bookings = [] }
         setListing(data.data);
       } catch (err) {
         console.log(err);
@@ -73,6 +84,9 @@ export default function ListingPage() {
 
   return (
     <div className="container pt-5">
+      <div className="row mb-3">
+        <Link to="/">Home</Link>
+      </div>
       <div className="row">
         <div className="col">
           <h1>{listing?.name}</h1>
@@ -85,23 +99,29 @@ export default function ListingPage() {
           </div>
           <div className="row bookings">
             <h2>Bookings</h2>
-            {listing?.bookings.map((booking, index) => {
-              const checkIn = new Date(booking.checkIn);
-              // Only display bookings that are after today
-              if (checkIn >= currentDate) {
-                return (
-                  <div className="booking">
-                    <h5>Booking {index + 1}</h5>
-                    <div className="d-flex gap-5">
-                      <p>Start: {new Date(booking.checkIn).toDateString()}</p>
-                      <p>End: {new Date(booking.checkOut).toDateString()}</p>
-                    </div>
-                  </div>
-                );
-              } else {
-                return null;
-              }
-            })}
+            {listing?.bookings === undefined
+              ? <p>"No bookings yet!"</p>
+              : listing?.bookings.map((booking, index) => {
+                  const checkIn = new Date(booking.checkIn);
+                  // Only display bookings that are after today
+                  if (checkIn >= currentDate) {
+                    return (
+                      <div className="booking">
+                        <h5>Booking {index + 1}</h5>
+                        <div className="d-flex gap-5">
+                          <p>
+                            Start: {new Date(booking.checkIn).toDateString()}
+                          </p>
+                          <p>
+                            End: {new Date(booking.checkOut).toDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    return null;
+                  }
+                })}
           </div>
         </div>
 
@@ -200,7 +220,9 @@ export default function ListingPage() {
               />
               <span>{errors.residentialAddress?.message?.toString()}</span>
             </label>
-            <button type="submit" disabled={disableSubmit}>Submit</button>
+            <button type="submit" disabled={disableSubmit}>
+              Submit
+            </button>
             <span>{formSubmitErr}</span>
           </form>
         </div>

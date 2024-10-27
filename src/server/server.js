@@ -17,7 +17,10 @@ const client = new MongoClient(uri);
 // Parse JSON bodies (as sent by API clients)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173"
+}));
+
 
 async function connectToDatabase() {
   try {
@@ -72,12 +75,38 @@ app.get("/api/data", async (req, res, next) => {
       );
     }
 
+    
+    // default limit to 4
     const limit = req.query.limit ? parseInt(req.query.limit) : 4;
     const offset = req.query.offset ? parseInt(req.query.offset) : 0;
-
-    // TODO: REMOVE THIS LIMIT!!!! Replace with pagination?
+    
+    // for some reason, X-Total-Count does not show up as a header
+    // so AAAAAAAAAAA
+    // const count = await db.collection("listingsAndReviews").countDocuments(findQuery);
     const data = await db.collection("listingsAndReviews").find(findQuery).skip(offset).limit(limit).toArray();
-    res.json(data);
+    res.status(200).set("X-Total-Count", count.toString()).json(data);
+  } catch (error) {
+    console.error("Failed to fetch data from MongoDB", error);
+    next(error);
+  }
+});
+
+// I need an entire separate endpoint for totalcount because HEADERS WONT GO THROUGH
+app.get("/api/data/count", async (req, res, next) => {
+  try {
+    const findQuery = {};
+    if (req.query.bedrooms) { findQuery.bedrooms = parseInt(req.query.bedrooms) }
+    if (req.query.property_type) { findQuery.bedrooms = req.query.property_type }
+    // make market search case-insensitive
+    if (req.query["address.market"]) {
+      findQuery["address.market"] = new RegExp(
+        `^${req.query["address.market"]}$`,
+        "i"
+      );
+    }
+
+    const count = await db.collection("listingsAndReviews").countDocuments(findQuery);
+    res.status(200).set("X-Total-Count", count.toString()).json(count);
   } catch (error) {
     console.error("Failed to fetch data from MongoDB", error);
     next(error);

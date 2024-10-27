@@ -77,10 +77,10 @@ const propertiesList = [
 ];
 const bedroomsList = ["", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20];
 
-function Listings({ currentListings }: { currentListings: Listing[] }) {
+function Listings({ currentListings, totalCount }: { currentListings: Listing[], totalCount: number }) {
   return (
     <div className="results-list">
-      <p>Found {currentListings.length} results</p>
+      <p>Found {totalCount} results</p>
       {currentListings.map((listing) => {
         return <ListingCard key={listing._id} listing={listing} />;
       })}
@@ -91,18 +91,23 @@ function Listings({ currentListings }: { currentListings: Listing[] }) {
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<any>("");
-  // todo: change to match with actual field names
+  const [currSearchParams, setCurrSearchParams] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Listing[]>([]);
   const [itemOffset, setItemOffset] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const itemsPerPage = 10; // Number of items per pag
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const itemsPerPage = 4; // Number of items per page
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const data: any = await axios.get(API_HOST + "/api/data");
-        setSearchResults(data.data);
+        const response: any = await axios.get(`${API_HOST}/api/data?limit=${itemsPerPage}`);
+        console.log(response);
+        setSearchResults(response.data);
+        const countResponse: any = await axios.get(`${API_HOST}/api/data/count`);
+        console.log(countResponse);
+        setTotalCount(countResponse.data);
       } catch (err: any) {
         setError(err);
       } finally {
@@ -117,9 +122,10 @@ export default function HomePage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        // TODO: add search params as well
-        const data: any = await axios.get(`${API_HOST}/api/data?offset=${itemOffset}&limit=${itemsPerPage}`);
+        const data: any = await axios.get(`${API_HOST}/api/data?offset=${itemOffset}&limit=${itemsPerPage}&${currSearchParams}`);
         setSearchResults(data.data);
+        const countResponse: any = await axios.get(`${API_HOST}/api/data/count?${currSearchParams}`)
+        setTotalCount(countResponse.data);
       } catch (err: any) {
         setError(err);
       } finally {
@@ -139,6 +145,7 @@ export default function HomePage() {
       const searchParamsString = new URLSearchParams(
         formData as any
       ).toString();
+      setCurrSearchParams(searchParamsString);
       const data = await axios.get(
         API_HOST + "/api/data?" + searchParamsString
       );
@@ -225,12 +232,25 @@ export default function HomePage() {
           <p>No results found... Try changing your search options!</p>
         ) : (
           <div>
-            <Listings currentListings={searchResults} />
             <ReactPaginate
               nextLabel="next >"
               onPageChange={handlePageClick}
               pageRangeDisplayed={2}
-              pageCount={111}
+              pageCount={Math.ceil(totalCount / itemsPerPage)}
+              previousLabel="< previous"
+              renderOnZeroPageCount={null}
+              containerClassName="pagination"
+              pageClassName="pagination-item"
+              pageLinkClassName="pagination-link"
+              activeClassName="active"
+              initialPage={currentPage}
+            />
+            <Listings currentListings={searchResults} totalCount={totalCount} />
+            <ReactPaginate
+              nextLabel="next >"
+              onPageChange={handlePageClick}
+              pageRangeDisplayed={2}
+              pageCount={Math.ceil(totalCount / itemsPerPage)}
               previousLabel="< previous"
               renderOnZeroPageCount={null}
               containerClassName="pagination"
