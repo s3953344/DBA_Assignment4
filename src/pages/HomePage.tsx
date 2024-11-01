@@ -253,8 +253,14 @@ export default function HomePage() {
               previousLabel="< previous"
               renderOnZeroPageCount={null}
               containerClassName="pagination"
-              pageClassName="pagination-item"
-              pageLinkClassName="pagination-link"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              breakClassName="page-item"
+              breakLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
               activeClassName="active"
             />
             {
