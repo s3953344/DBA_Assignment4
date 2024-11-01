@@ -18,6 +18,11 @@
   box-shadow: rgba(162, 162, 162, 0.361) 0px 0px 10px;
 }
 
+.rounded {
+  border-radius: 1rem;
+  border: 1px solid rgb(221, 221, 221);
+}
+
 .bookings {
   max-height: 200px;
   overflow-y: auto;

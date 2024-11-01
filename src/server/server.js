@@ -1,5 +1,5 @@
 // AVAILABLE ON PORT 3000
-const API_HOST = "http://localhost:3000";
+export const API_HOST = "http://localhost:3000";
 
 import cors from 'cors'
 import express from "express";
@@ -17,9 +17,7 @@ const client = new MongoClient(uri);
 // Parse JSON bodies (as sent by API clients)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors({
-  origin: "http://localhost:5173"
-}));
+app.use(cors());
 
 
 async function connectToDatabase() {

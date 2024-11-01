@@ -29,9 +29,9 @@ export default function ListingPage() {
     handleSubmit,
     formState: { errors },
     getValues,
-    reset,
   } = useForm<Booking>({
     mode: "onChange",
+    // // For testing creating bookings!
     // defaultValues: {
     //   name: "DEFAULT",
     //   email: "DEFAULT@gmail.com",
@@ -95,7 +95,7 @@ export default function ListingPage() {
           </div>
           <h2>Bookings</h2>
           {/* ###### BOOKINGS ####### */}
-          <div className="row bookings shadow p-3">
+          <div className="row bookings rounded shadow p-3">
             {listing?.bookings === undefined
               ? <p>No bookings yet!</p>
               : listing?.bookings.map((booking, index) => {
@@ -124,7 +124,7 @@ export default function ListingPage() {
 
         <div className="col px-5">
           <form
-            className="booking-form shadow d-flex flex-column gap-1 p-3"
+            className="booking-form shadow rounded d-flex flex-column gap-1 p-3"
             onSubmit={handleSubmit(onSubmit)}
           >
             <h3>Booking Details</h3>

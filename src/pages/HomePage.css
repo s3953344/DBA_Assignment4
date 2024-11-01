@@ -41,7 +41,7 @@
 }
 
 .listing-card {
-  border: gray 1px solid;
+  border: rgb(179, 179, 179) 1px solid;
   border-radius: 1rem;
   box-shadow: rgba(162, 162, 162, 0.361) 0px 0px 5px;
   margin: 1rem;
@@ -61,3 +61,7 @@
   margin: 0.2rem;
 }
 
+/* pagination */
+.pagination {
+  justify-content: center;
+}
