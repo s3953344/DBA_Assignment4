@@ -87,6 +87,92 @@ function Listings({ currentListings }: { currentListings: Listing[] }) {
   );
 }
 
+function SearchForm({
+  setCurrSearchParams,
+  setIsLoading,
+  setError,
+  setCurrentPage,
+  setTotalCount,
+  setSearchResults,
+}: {
+  setCurrSearchParams: React.Dispatch<React.SetStateAction<string>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<any>>;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  setTotalCount: React.Dispatch<React.SetStateAction<number>>;
+  setSearchResults: React.Dispatch<React.SetStateAction<Listing[]>>;
+}) {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+
+    try {
+      setIsLoading(true);
+      const formData = new FormData(e.target as HTMLFormElement);
+      const searchParamsString = new URLSearchParams(
+        formData as any
+      ).toString();
+      setCurrSearchParams(searchParamsString);
+      const data = await axios.get(
+        API_HOST + "/api/data?" + searchParamsString
+      );
+      setSearchResults(data.data);
+      const countResponse: any = await axios.get(
+        `${API_HOST}/api/data/count?${searchParamsString}`
+      );
+      setCurrentPage(0);
+      setTotalCount(countResponse.data);
+    } catch (err: any) {
+      console.log(err);
+      setError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="listing-search-form">
+      <label id="search-bar">
+        Location
+        <input
+          name="address.market"
+          id="location"
+          placeholder="For example: Porto"
+          required
+        />
+      </label>
+      <label>
+        Bedrooms
+        <select id="bedrooms" name="bedrooms">
+          {bedroomsList.map((value, index) => {
+            return (
+              <option key={index} value={value}>
+                {value}
+              </option>
+            );
+          })}
+        </select>
+      </label>
+      <label>
+        Property type
+        <select id="property_type" name="property_type">
+          {propertiesList.map((value, index) => {
+            return (
+              <option key={index} value={value}>
+                {value}
+              </option>
+            );
+          })}
+        </select>
+      </label>
+      <button type="submit" className="btn btn-primary">
+        Search
+      </button>
+    </form>
+  );
+}
+
+function SearchResults() {}
+
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<any>("");
@@ -137,33 +223,6 @@ export default function HomePage() {
     fetchData();
   }, [itemOffset]);
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
-
-    try {
-      setIsLoading(true);
-      const formData = new FormData(e.target as HTMLFormElement);
-      const searchParamsString = new URLSearchParams(
-        formData as any
-      ).toString();
-      setCurrSearchParams(searchParamsString);
-      const data = await axios.get(
-        API_HOST + "/api/data?" + searchParamsString
-      );
-      setSearchResults(data.data);
-      const countResponse: any = await axios.get(
-        `${API_HOST}/api/data/count?${searchParamsString}`
-      );
-      setCurrentPage(0);
-      setTotalCount(countResponse.data);
-    } catch (err: any) {
-      console.log(err);
-      setError(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handlePageClick = (event: { selected: number }) => {
     const newOffset = (event.selected * itemsPerPage) % totalCount;
     setItemOffset(newOffset);
@@ -173,77 +232,17 @@ export default function HomePage() {
 
   return (
     <div className="home-page container">
-      <div className="top-section">
-        <form onSubmit={handleSubmit} className="listing-search-form">
-          <label id="search-bar">
-            Location
-            <input
-              name="address.market"
-              id="location"
-              placeholder="For example: Porto"
-              required
-            />
-          </label>
-          <label>
-            Bedrooms
-            <select id="bedrooms" name="bedrooms">
-              {bedroomsList.map((value, index) => {
-                return (
-                  <option key={index} value={value}>
-                    {value}
-                  </option>
-                );
-              })}
-            </select>
-          </label>
-          <label>
-            Property type
-            <select id="property_type" name="property_type">
-              {propertiesList.map((value, index) => {
-                return (
-                  <option key={index} value={value}>
-                    {value}
-                  </option>
-                );
-              })}
-            </select>
-          </label>
-          <button type="submit" className="btn btn-primary">
-            Search
-          </button>
-        </form>
-      </div>
-
+      <div className="top-section"></div>
+      <SearchForm
+        setCurrSearchParams={setCurrSearchParams}
+        setIsLoading={setIsLoading}
+        setError={setError}
+        setCurrentPage={setCurrentPage}
+        setTotalCount={setTotalCount}
+        setSearchResults={setSearchResults}
+      />
       <div className="container bottom-section row">
-        {isLoading ? (
-          <div className="loading">
-            <i>Loading listings. This may take a few seconds.</i>
-            <ThreeDots
-              visible={true}
-              height="80"
-              width="80"
-              color="#4fa94d"
-              radius="9"
-              ariaLabel="three-dots-loading"
-              wrapperStyle={{}}
-              wrapperClass=""
-            />
-          </div>
-        ) : error ? (
-          // Render error message if error occurred
-          <div>
-            {error.code === "ERR_NETWORK" && (
-              <p>
-                Could not connect to server. Are you sure you ran it? Use the
-                command "node ./src/server/server.js" from the root folder to
-                connect to MongoDB.
-              </p>
-            )}
-            <i>{error.toString()}</i>
-          </div>
-        ) : searchResults.length === 0 ? (
-          <p>No results found... Try changing your search options!</p>
-        ) : (
+        {
           <div>
             <p>Found {totalCount} results</p>
             <ReactPaginate
@@ -257,24 +256,42 @@ export default function HomePage() {
               pageClassName="pagination-item"
               pageLinkClassName="pagination-link"
               activeClassName="active"
-              initialPage={currentPage}
             />
-            <Listings currentListings={searchResults} />
-            <ReactPaginate
-              nextLabel="next >"
-              onPageChange={handlePageClick}
-              pageRangeDisplayed={2}
-              pageCount={Math.ceil(totalCount / itemsPerPage)}
-              previousLabel="< previous"
-              renderOnZeroPageCount={null}
-              containerClassName="pagination"
-              pageClassName="pagination-item"
-              pageLinkClassName="pagination-link"
-              activeClassName="active"
-              initialPage={currentPage}
-            />
+            {
+              isLoading ? (
+                <div className="loading d-flex flex-column align-items-center">
+                  <i>Loading listings. This may take a few seconds.</i>
+                  <ThreeDots
+                    visible={true}
+                    height="80"
+                    width="80"
+                    color="#4fa94d"
+                    radius="9"
+                    ariaLabel="three-dots-loading"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                  />
+                </div>
+              ) : error ? (
+                // Render error message if error occurred
+                <div>
+                  {error.code === "ERR_NETWORK" && (
+                    <p>
+                      Could not connect to server. Are you sure you ran it? Use the
+                      command "node ./src/server/server.js" from the root folder to
+                      connect to MongoDB.
+                    </p>
+                  )}
+                  <i>{error.toString()}</i>
+                </div>
+              ) : searchResults.length === 0 ? (
+                <p>No results found... Try changing your search options!</p>
+              ) : (
+                <Listings currentListings={searchResults} />
+              )
+            }
           </div>
-        )}
+        }
       </div>
     </div>
   );
@@ -292,10 +309,12 @@ function ListingCard({ listing }: { listing: Listing }) {
       <p>{listing.summary}</p>
 
       <div className="listing-stats">
-        <b>Location:</b> <p>{listing.address.market ? listing.address.market : "N/A"}</p>
+        <b>Location:</b>{" "}
+        <p>{listing.address.market ? listing.address.market : "N/A"}</p>
         <b>Daily price:</b> <p>${price ? price : "N/A"}</p>
         <b>Customer rating:</b> <p>{rating ? rating : "N/A"}</p>
-        <b>Property Type:</b> <p>{listing.property_type ? listing.property_type : "N/A"}</p>
+        <b>Property Type:</b>{" "}
+        <p>{listing.property_type ? listing.property_type : "N/A"}</p>
         <b>Bedrooms:</b> <p>{listing.bedrooms ? listing.bedrooms : "N/A"}</p>
       </div>
     </div>
