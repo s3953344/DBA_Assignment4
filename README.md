@@ -1,4 +1,5 @@
 # React + TypeScript + Vite
+Made by Frederick Hadi (s3953344). The app implements pagination because rendering 5555 search results takes a long time. Bookings are stored using the embedded approach. You can see all the test bookings I made in the first property listing (which has the name Ribera something).
 
 Run the following commands to boot up the web app:
 - npm install
